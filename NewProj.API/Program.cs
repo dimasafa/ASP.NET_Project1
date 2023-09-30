@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using NewProj.API.Mappings;
+using NewProj.API.Repositories;
 using NZWalks.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,11 @@ builder.Services.AddDbContext<NZWalksDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("NZWalksConnectionString"));
 });
+// регистрируем службу SQLRegionRepository как реализацию интерфейса IRegionRepository. AddScoped - регистрирует службу в контейнере зависимостей
+builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
+
+// anmeldung vom Automapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
 var app = builder.Build();
 
