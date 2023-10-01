@@ -18,6 +18,7 @@ builder.Services.AddDbContext<NZWalksDbContext>(options =>
 });
 // регистрируем службу SQLRegionRepository как реализацию интерфейса IRegionRepository. AddScoped - регистрирует службу в контейнере зависимостей
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
+builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 
 // anmeldung vom Automapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));

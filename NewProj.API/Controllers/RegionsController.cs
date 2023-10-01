@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NewProj.API.CustomActionFilters;
 using NewProj.API.Models.Domain;
 using NewProj.API.Models.DTO;
 using NewProj.API.Repositories;
@@ -92,7 +93,7 @@ namespace NewProj.API.Controllers
         // POST: https://localhost:1234/api/regions
 
         [HttpPost]
-
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
             // Map or Convert DTO to Damain Model
@@ -120,12 +121,14 @@ namespace NewProj.API.Controllers
             var regionDto = mapper.Map<RegionDto>(regionDomainModel);
 
             return CreatedAtAction(nameof(GetById), new { id = regionDto.id }, regionDto);
+
         }
 
         // Update Region
         // PUT: https://localhost:1234/api/regions/{id}
         [HttpPut]
         [Route("{id:Guid}")]
+        [ValidateModel]
 
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
         {
