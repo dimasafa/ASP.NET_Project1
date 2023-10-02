@@ -61,7 +61,7 @@ namespace NewProj.API.Controllers
 
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var walksDomainModel = await walkRepository.GetByIdAsync(id);
+            var walksDomainModel = await walkRepository.GetByIdAsync(id); 
 
             if (walksDomainModel == null)
             {

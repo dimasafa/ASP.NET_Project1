@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,8 @@ namespace NewProj.API.Controllers
     // https://localhost:1234/api/regions
     [Route("api/[controller]")]
     [ApiController]
+    // Keine Nutzer ohne Authorisation (jwt token) diese Controller nutzen kann.
+    
     public class RegionsController : ControllerBase
     {
         // создаем конструктор для подключения к базе данных
@@ -31,6 +34,7 @@ namespace NewProj.API.Controllers
         // Получить все регионы
         // GET: https://localhost:1234/api/regions
         [HttpGet]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
             // создаем переменную и кладем туда таблицу регионов из бд, преобразуя в лист. Это модель предметной области. Никогда не возвращем обратно,
@@ -62,6 +66,7 @@ namespace NewProj.API.Controllers
         [HttpGet]
         // создаем роут, который будет проверять id с тем, что вводят в метод, и далее связываем с аргументом в методе через [FromRoute]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetById([FromRoute]Guid id)
         {
             // suchen in DB unsere id
@@ -94,6 +99,7 @@ namespace NewProj.API.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
             // Map or Convert DTO to Damain Model
@@ -129,6 +135,7 @@ namespace NewProj.API.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
 
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
         {
@@ -168,6 +175,7 @@ namespace NewProj.API.Controllers
         // DELETE: https://localhost:1234/api/regions/{id}
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
 
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
