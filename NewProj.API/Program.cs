@@ -8,12 +8,31 @@ using System.Text;
 using NewProj.API.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.FileProviders;
+using Serilog;
+using Microsoft.AspNetCore.Diagnostics;
+using NewProj.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add Serilog
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    // Logs in File(Path bis File und interval, nachdem wird einen neuen File erstellt)
+    .WriteTo.File("Logs/NzWalks.txt", rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Information()
+    .CreateLogger();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
+// Add services to the container.
 builder.Services.AddControllers();
+// Add actuelle Path von API (notwendig um die Path bis Images zu erhalten.)
+builder.Services.AddHttpContextAccessor();
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 // Erweiterung von swagger, um jwt token zu testieren 
@@ -62,6 +81,7 @@ builder.Services.AddDbContext<NZWalksAuthDbContext>(options =>
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
 
 // anmeldung vom Automapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
@@ -114,10 +134,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Global Logger
+app.UseMiddleware<ExceptionHandlerMiddlware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Addieren die Möglichkeit mit static file zu arbeiten (zb. Images, html usw.)
+app.UseStaticFiles(new StaticFileOptions
+{
+    // Addieren die Path, wo werden wir Images nehmen
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
+    RequestPath = "/Images"
+});
 
 app.MapControllers();
 
